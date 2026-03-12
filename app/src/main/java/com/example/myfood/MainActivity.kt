@@ -4,13 +4,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.runtime.*
+import com.example.myfood.ui.home.HomeScreen
 import com.example.myfood.ui.theme.MyFoodTheme
 
 class MainActivity : ComponentActivity() {
@@ -19,29 +14,29 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MyFoodTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+                AppNavigation()
             }
         }
     }
 }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
+// Navigation simple par variable d'état
+sealed class Screen {
+    object Home : Screen()
+    data class Detail(val mealId: String) : Screen()
 }
 
-@Preview(showBackground = true)
 @Composable
-fun GreetingPreview() {
-    MyFoodTheme {
-        Greeting("Android")
+fun AppNavigation() {
+    var currentScreen by remember { mutableStateOf<Screen>(Screen.Home) }
+
+    when (val screen = currentScreen) {
+        is Screen.Home -> {
+            HomeScreen(onMealClick = { id -> currentScreen = Screen.Detail(id) })
+        }
+        is Screen.Detail -> {
+            // TODO : DetailScreen sera ajouté dans la prochaine étape
+            HomeScreen(onMealClick = { id -> currentScreen = Screen.Detail(id) })
+        }
     }
 }
